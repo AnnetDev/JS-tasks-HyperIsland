@@ -2,6 +2,10 @@ const body = document.querySelector('body');
 const container = document.createElement('div');
 const expensesListContainer = document.createElement('div');
 const addExpenseBtn = document.createElement('button');
+const removeExpenseBtn = document.createElement('button');
+const removeExpenseInput = document.createElement('input');
+
+
 const expensesList = document.createElement('ul');
 
 const inputDescription = document.createElement('input');
@@ -25,6 +29,23 @@ const categoryMonthInput = document.createElement('input');
 const categoryMonthBtn = document.createElement('button');
 const categoryMonthResult = document.createElement('div');
 
+const descriptionSearchContainer = document.createElement('div');
+const descriptionSearchHeading = document.createElement('p');
+const descriptionSearchInput = document.createElement('input');
+const descriptionSearchBtn = document.createElement('button');
+const descriptionSearchResult = document.createElement('div');
+
+const listCategoriesContainer = document.createElement('div');
+const listCategoriesHeading = document.createElement('p');
+const listCategoriesBtn = document.createElement('button');
+const listCategoriesResult = document.createElement('div');
+
+const budgetContainer = document.createElement('div');
+const budgetHeading = document.createElement('p');
+const budgetInput = document.createElement('input');
+const budgetBtn = document.createElement('button');
+const budgetResult = document.createElement('div');
+
 
 
 body.appendChild(container);
@@ -38,6 +59,9 @@ expensesListContainer.appendChild(inputDescription);
 expensesListContainer.appendChild(inputAmount);
 expensesListContainer.appendChild(inputCategory);
 expensesListContainer.appendChild(inputDate);
+expensesListContainer.appendChild(removeExpenseBtn);
+expensesListContainer.appendChild(removeExpenseInput);
+
 container.appendChild(categorySummaryContainer);
 categorySummaryContainer.appendChild(categorySummaryHeading);
 categorySummaryContainer.appendChild(categorySummaryInput);
@@ -48,9 +72,25 @@ categoryMonthContainer.appendChild(categoryMonthHeading);
 categoryMonthContainer.appendChild(categoryMonthInput);
 categoryMonthContainer.appendChild(categoryMonthBtn);
 categoryMonthContainer.appendChild(categoryMonthResult);
+container.appendChild(descriptionSearchContainer);
+descriptionSearchContainer.appendChild(descriptionSearchHeading);
+descriptionSearchContainer.appendChild(descriptionSearchInput);
+descriptionSearchContainer.appendChild(descriptionSearchBtn);
+descriptionSearchContainer.appendChild(descriptionSearchResult);
+container.appendChild(listCategoriesContainer);
+listCategoriesContainer.appendChild(listCategoriesHeading); 
+listCategoriesContainer.appendChild(listCategoriesBtn);
+listCategoriesContainer.appendChild(listCategoriesResult);
+container.appendChild(budgetContainer);
+budgetContainer.appendChild(budgetHeading);
+budgetContainer.appendChild(budgetInput);
+budgetContainer.appendChild(budgetBtn);
+budgetContainer.appendChild(budgetResult);
 
 
 addExpenseBtn.textContent = 'Add Expense';
+removeExpenseBtn.textContent = 'Remove Expense';
+removeExpenseInput.placeholder = 'By ID';
 inputDescription.placeholder = 'Description';
 inputAmount.placeholder = 'Amount';
 inputCategory.placeholder = 'Category';
@@ -64,6 +104,15 @@ categorySummaryInput.placeholder = 'Add category';
 categoryMonthHeading.textContent = 'Monthly Summary';
 categoryMonthBtn.textContent = 'Show Summary';
 categoryMonthInput.placeholder = 'Add month YYYY-MM';
+descriptionSearchHeading.textContent = 'Search Expenses';
+descriptionSearchInput.placeholder = 'Search...';
+descriptionSearchBtn.textContent = 'Search';
+listCategoriesHeading.textContent = 'All Categories';
+listCategoriesBtn.textContent = 'Show Categories';
+budgetHeading.textContent = 'Budget Status';
+budgetInput.placeholder = 'Add amount';
+budgetBtn.textContent = 'Check Status';
+
 
 let icon = '🧾';
 
@@ -78,6 +127,9 @@ display: flex;
 flex-direction: column;
 align-items: center;
 gap: 20px;`;
+removeExpenseBtn.style.cssText = `
+display: block;
+margin-top: 30px;`;
 
 let expenses = [
     { id: 1, description: 'Milk', amount: 150.00, date: '2024-06-01', category: 'Groceries' },
@@ -231,3 +283,91 @@ function monthlySummary(month) {
 }
 
 categoryMonthBtn.addEventListener('click', monthlySummary);
+
+function searchExpenses(query) {
+    query = descriptionSearchInput.value.trim().toLowerCase();
+
+    descriptionSearchResult.innerHTML = '';
+    let found = false;
+
+
+    if (query.length === 0) {
+        const errorMsg = document.createElement('div');
+        errorMsg.textContent = 'Type something to search';
+        descriptionSearchResult.appendChild(errorMsg);
+
+        setTimeout(() => {
+            errorMsg.remove();
+        }, 2000);
+        return;
+    }
+
+    expenses.forEach(expense => {
+        if (expense.description.toLocaleLowerCase().includes(query)) {
+            found = true;   
+            const expenseItem = document.createElement('div');
+            const expenseId = expense.id;
+            const expenseDate = expense.date;
+            const expenseDescription = expense.description;
+            const expenseAmount = Number(expense.amount.toFixed(2));
+            const expenseCategory = expense.category;
+            expenseItem.textContent = `${icon} (${expenseId}) ${expenseDate} — ${expenseCategory} — $${expenseAmount.toFixed(2)} - ${expenseDescription}`;
+            descriptionSearchResult.appendChild(expenseItem);
+        }
+    });
+
+    if (!found) {
+        const errorMsg = document.createElement('p');
+        errorMsg.textContent = 'No results found';
+        errorMsg.style.color = 'red';
+        descriptionSearchResult.appendChild(errorMsg);
+
+        setTimeout(() => {
+            errorMsg.remove();
+        }, 3000);
+        return;
+    }
+}
+
+descriptionSearchBtn.addEventListener('click', searchExpenses);
+
+
+function listCategories() {
+    listCategoriesResult.innerHTML = '';
+
+    const categoriesArr = expenses.map(expense => expense.category);
+    const uniqueCategories = new Set(categoriesArr);
+    console.log(uniqueCategories);
+
+    uniqueCategories.forEach(category => {
+        const categoryItem = document.createElement('p');
+        categoryItem.textContent = category;
+        listCategoriesResult.appendChild(categoryItem);
+    });
+}
+
+listCategoriesBtn.addEventListener('click', listCategories);
+
+function removeExpense(id) {
+    id = Number(removeExpenseInput.value.trim());
+    const expenseFound = expenses.find(expense => expense.id === Number(id));
+    if (!expenseFound) return alert('expense not found!');
+
+    const filteredExpenses = expenses.filter(expense => expense.id !== id);
+
+    expenses = filteredExpenses;
+    listExpenses();
+};
+
+removeExpenseBtn.addEventListener('click', removeExpense);
+
+
+// - `budgetStatus(budgetAmount, month)` — compare monthly total to a budget; log under/over and percentage. 
+// - Sorting helpers: `sortByAmount()` (high→low), `sortByDate()` (newest→oldest), `sortByCategory()` (A→Z).
+
+
+function budgetStatus(budgetAmount, month) {
+
+}
+
+budgetBtn.addEventListener('click', budgetStatus);

@@ -102,7 +102,7 @@ After `searchExpenses('mi')`:
 
 ## Stretch Goals (optional, 20–40 min)
 - `removeExpense(id)` — delete by id with helpful message if not found.
-- `budgetStatus(budgetAmount, month)` — compare monthly total to a budget; log under/over and percentage.
+- `budgetStatus(budgetAmount, month)` — compare monthly total to a budget; log under/over and percentage. 
 - Sorting helpers: `sortByAmount()` (high→low), `sortByDate()` (newest→oldest), `sortByCategory()` (A→Z).
 
 ## Milestones & Timeboxes

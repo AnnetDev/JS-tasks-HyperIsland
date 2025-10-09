@@ -43,6 +43,8 @@ const listCategoriesResult = document.createElement('div');
 const budgetContainer = document.createElement('div');
 const budgetHeading = document.createElement('p');
 const budgetInput = document.createElement('input');
+const budgetMonthInput = document.createElement('input');
+
 const budgetBtn = document.createElement('button');
 const budgetResult = document.createElement('div');
 
@@ -78,14 +80,16 @@ descriptionSearchContainer.appendChild(descriptionSearchInput);
 descriptionSearchContainer.appendChild(descriptionSearchBtn);
 descriptionSearchContainer.appendChild(descriptionSearchResult);
 container.appendChild(listCategoriesContainer);
-listCategoriesContainer.appendChild(listCategoriesHeading); 
+listCategoriesContainer.appendChild(listCategoriesHeading);
 listCategoriesContainer.appendChild(listCategoriesBtn);
 listCategoriesContainer.appendChild(listCategoriesResult);
 container.appendChild(budgetContainer);
 budgetContainer.appendChild(budgetHeading);
 budgetContainer.appendChild(budgetInput);
+budgetContainer.appendChild(budgetMonthInput);
 budgetContainer.appendChild(budgetBtn);
 budgetContainer.appendChild(budgetResult);
+
 
 
 addExpenseBtn.textContent = 'Add Expense';
@@ -112,6 +116,7 @@ listCategoriesBtn.textContent = 'Show Categories';
 budgetHeading.textContent = 'Budget Status';
 budgetInput.placeholder = 'Add amount';
 budgetBtn.textContent = 'Check Status';
+budgetMonthInput.placeholder = 'Add month YYYY-MM';
 
 
 let icon = '🧾';
@@ -227,23 +232,25 @@ function totalByCategory(category) {
     categorySummaryResult.innerHTML = '';
     const summary = document.createElement('p');
 
-    if (!category) {
+    if (!category || category.length === 0) { // to debug
         categorySummaryResult.textContent = 'Please enter a category name.';
         return;
     }
 
     let count = 0;
     let total = 0;
+    let categoryFound;
 
     expenses.forEach(expense => {
-        if (expense.category.toLowerCase() === category) {
+        if (expense.category.toLowerCase().startsWith(category)) {
             count++;
             total += expense.amount;
+            categoryFound = expense.category;
         }
     });
 
     if (count > 0) {
-        summary.textContent = `Category: ${category} | Count: ${count} | Total: $${total.toFixed(2)}`;
+        summary.textContent = `Category: ${categoryFound} | Count: ${count} | Total: $${total.toFixed(2)}`;
     } else {
         summary.textContent = `No expenses found for category: ${category}`;
     }
@@ -254,7 +261,7 @@ function totalByCategory(category) {
 categorySummaryBtn.addEventListener('click', totalByCategory);
 
 
-function monthlySummary(month) {
+function monthlySummary(month) { // to debug validate date
     month = categoryMonthInput.value.trim();
     categoryMonthResult.innerHTML = '';
 
@@ -304,7 +311,7 @@ function searchExpenses(query) {
 
     expenses.forEach(expense => {
         if (expense.description.toLocaleLowerCase().includes(query)) {
-            found = true;   
+            found = true;
             const expenseItem = document.createElement('div');
             const expenseId = expense.id;
             const expenseDate = expense.date;
@@ -367,7 +374,16 @@ removeExpenseBtn.addEventListener('click', removeExpense);
 
 
 function budgetStatus(budgetAmount, month) {
+    budgetResult.innerHTML = '';
 
+    budgetAmount = Number(budgetInput.value.trim());
+    month = budgetMonthInput.value.trim();
+
+
+    expenses.forEach(expense => {
+        if (expense.date.startsWith(month)) {
+        }
+    });
 }
 
 budgetBtn.addEventListener('click', budgetStatus);
